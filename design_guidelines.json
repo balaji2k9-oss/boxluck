@@ -1,0 +1,113 @@
+{
+  "theme": "light",
+  "archetype": "Neo-Brutalist Pop (Fun, Colorful, Playful - Hype Drop Vibe)",
+  "typography": {
+    "headings": {
+      "family": "'Cabinet Grotesk', sans-serif",
+      "weight": "font-black",
+      "tracking": "tracking-tighter",
+      "import_url": "https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@900,800,700&display=swap",
+      "guideline": "Use for all large text, hero sections, and numbers. Extremely wide, heavy, and punchy."
+    },
+    "body": {
+      "family": "'Outfit', sans-serif",
+      "weight": "font-medium",
+      "import_url": "https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700&display=swap",
+      "guideline": "Use for product descriptions, functional UI, and manifesto body text."
+    },
+    "scale": {
+      "h1": "text-6xl sm:text-7xl lg:text-[8vw] leading-[0.9]",
+      "h2": "text-5xl sm:text-6xl lg:text-7xl leading-[1.0]",
+      "h3": "text-3xl sm:text-4xl lg:text-5xl",
+      "h4": "text-xl sm:text-2xl",
+      "body": "text-base lg:text-lg",
+      "labels": "text-sm tracking-[0.2em] uppercase font-bold"
+    }
+  },
+  "colors": {
+    "css_variables": {
+      "--bg-base": "#FDFBF7",
+      "--surface": "#FFFFFF",
+      "--text-main": "#09090B",
+      "--text-muted": "#52525B",
+      "--border-heavy": "#09090B",
+      "--accent-yellow": "#FFEA00",
+      "--accent-pink": "#FF007F",
+      "--accent-cyan": "#00F0FF",
+      "--accent-purple": "#8A2BE2",
+      "--accent-green": "#39FF14"
+    },
+    "tailwind_classes": {
+      "bg_base": "bg-[#FDFBF7]",
+      "text_main": "text-[#09090B]",
+      "border_heavy": "border-[#09090B]"
+    },
+    "guideline": "Avoid gradients. Use solid blocks of primary colors with thick borders to create a comic/pop-art tactile feel."
+  },
+  "visual_enhancers": {
+    "shadows": {
+      "brutal": "4px 4px 0px 0px #09090B",
+      "brutal_lg": "8px 8px 0px 0px #09090B",
+      "brutal_hover": "6px 6px 0px 0px #09090B",
+      "brutal_active": "0px 0px 0px 0px #09090B"
+    },
+    "borders": {
+      "thick": "border-4 border-[#09090B]",
+      "medium": "border-2 border-[#09090B]",
+      "thin": "border border-[#09090B]"
+    },
+    "radius": {
+      "cards": "rounded-2xl",
+      "buttons": "rounded-full"
+    }
+  },
+  "motion": {
+    "libraries": [
+      "framer-motion",
+      "@studio-freight/react-lenis",
+      "react-fast-marquee"
+    ],
+    "hero_reveal": "Staggered line-by-line reveal. Wrap each text line in an overflow-hidden div, and animate the inner text from translateY(100%) to translateY(0%) with a custom cubic-bezier(0.76, 0, 0.24, 1).",
+    "hover_states": "Hover on cards/buttons should translate-x-[-2px] translate-y-[-2px] and expand the drop shadow. Active states should translate to 0 and remove the shadow completely (press effect).",
+    "scroll_animations": "Use framer-motion whileInView to trigger staggered fade-up and scale-in (0.95 to 1.0) on grid items.",
+    "parallax": "Use framer-motion useScroll to slightly translate Y the hero images relative to scroll position."
+  },
+  "layouts": {
+    "hero": "Kinetic layout. H1 typography covers the screen. A central 3D/floating box image interacts with mouse movement (use framer-motion useTransform).",
+    "categories_bento": "Tetris Grid: 12-column CSS grid. Span items asymmetrically (e.g. Gamer Box: col-span-8, Snack Box: col-span-4). Use thick gap (gap-6).",
+    "pricing": "3-column flex or grid. The ₹599 Premium tier should scale(1.05) by default, colored in striking Yellow, while others are Pink and Cyan.",
+    "manifesto": "Numbered list layout (01, 02, 03). Massive numbers using the accent colors, left-aligned text.",
+    "golden_box": "Inverted section. Background black (#09090B). Text white. Use glowing gold accents and a ticking countdown timer for hype."
+  },
+  "component_guidelines": {
+    "button": "Pill shaped (rounded-full). Padding: py-4 px-8. Border: 2px solid #09090B. Shadow: brutal. Text: uppercase, bold, tracking-wider.",
+    "card": "Solid color background, rounded-2xl, border-2 or border-4 solid #09090B. Inner padding should be generous (p-6 or p-8). Image should be masked with rounded-xl inside.",
+    "marquee": "Slow editorial marquee. 100vw width, 2px border top and bottom. High contrast text reading 'EVERY BOX. A NEW SURPRISE.' repeated."
+  },
+  "media": {
+    "images": {
+      "hero_box": "https://images.unsplash.com/photo-1573376671258-62ee7b68c853?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MTN8MHwxfHNlYXJjaHwyfHxjb2xvcmZ1bCUyMGNhcmRib2FyZCUyMGJveHxlbnwwfHx8fDE3ODU5OTM4NDJ8MA&ixlib=rb-4.1.0&q=85",
+      "category_gamer": "https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTN8MHwxfHNlYXJjaHwyfHxnYW1pbmclMjBjb250cm9sbGVyJTIwbmVvbnxlbnwwfHx8fDE3ODU5OTM4NDJ8MA&ixlib=rb-4.1.0&q=85",
+      "category_beauty": "https://images.unsplash.com/photo-1600428877878-1a0fd85beda8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njd8MHwxfHNlYXJjaHwzfHxza2luY2FyZSUyMGJlYXV0eSUyMHByb2R1Y3RzJTIwZmxhdGxheXxlbnwwfHx8fDE3ODU5OTM4NDJ8MA&ixlib=rb-4.1.0&q=85",
+      "category_anime": "https://images.unsplash.com/photo-1714537097791-be0ba0473b9c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxNzV8MHwxfHNlYXJjaHwyfHxhbmltZSUyMGFjdGlvbiUyMGZpZ3VyZXxlbnwwfHx8fDE3ODU5OTM4NDJ8MA&ixlib=rb-4.1.0&q=85",
+      "category_snack": "https://images.unsplash.com/photo-1666274694243-9997eb427237?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDN8MHwxfHNlYXJjaHwyfHxjYW5keSUyMHNuYWNrcyUyMGNvbG9yZnVsfGVufDB8fHx8MTc4NTk5Mzg0Mnww&ixlib=rb-4.1.0&q=85",
+      "golden_box": "https://images.unsplash.com/photo-1674620213535-9b2a2553ef40?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHwxfHxnb2xkZW4lMjBnaWZ0JTIwYm94fGVufDB8fHx8MTc4NTk5Mzg0Mnww&ixlib=rb-4.1.0&q=85",
+      "unboxing_ugc": "https://images.unsplash.com/photo-1608573773585-199ff9a61c09?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NzB8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBvcGVuaW5nJTIwZ2lmdCUyMGV4Y2l0ZWR8ZW58MHx8fHwxNzg1OTkzODQyfDA&ixlib=rb-4.1.0&q=85"
+    }
+  },
+  "accessibility": {
+    "data_testid_rule": "All interactive and key informational elements MUST include a data-testid attribute in kebab-case format.",
+    "contrast": "Maintain 4.5:1 ratio. Dark text on neon/bright backgrounds is mandatory. Do not use white text on yellow or pink.",
+    "transparency": "DO NOT use complete transparent backgrounds for overlays, dropdowns, or headers where content sits underneath."
+  },
+  "GENERAL_UI_UX_DESIGN_GUIDELINES": "Implement an Awwwards Site-of-the-Day level experience. Emphasize scarcity and hype-drop mechanics (countdowns, large bold typography).",
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Do not center-align the app container. No generic SaaS styling.",
+    "Use 2-3x more padding than usual to give the design breathing room.",
+    "Every button and card must have a micro-interaction (scale or brutalist press effect).",
+    "Import fonts in index.css or via Google Fonts in HTML head.",
+    "Do not use AI emojis. Use @phosphor-icons/react (duotone or bold) instead.",
+    "Build standard HTML/Tailwind for the landing page visual sections; use Shadcn for forms, dialogs, checkout flow.",
+    "Add 'data-testid' to ALL buttons, links, and forms."
+  ]
+}
