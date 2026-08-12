@@ -101,13 +101,72 @@ const Hero = () => {
             <motion.div
               animate={{ x: tilt.x, y: tilt.y }}
               transition={{ type: "spring", stiffness: 60, damping: 12 }}
-              className="relative brutal-lg rounded-2xl overflow-hidden bg-white rotate-2"
+              className="relative brutal-lg rounded-2xl overflow-hidden rotate-2"
+              style={{ background: "radial-gradient(circle at 50% 30%, #A855F7 0%, #8A2BE2 45%, #4C1D95 100%)" }}
             >
-              <img
-                src="https://images.unsplash.com/photo-1573376671258-62ee7b68c853?crop=entropy&cs=srgb&fm=jpg&q=85&w=900"
-                alt="Mystery box"
-                className="w-full h-[360px] md:h-[460px] object-cover"
-              />
+              <div className="relative w-full h-[360px] md:h-[460px] grid place-items-center" data-testid="hero-animated-box">
+                {/* radiating burst behind box */}
+                <motion.div
+                  aria-hidden
+                  className="absolute w-[420px] h-[420px]"
+                  style={{ background: "conic-gradient(from 0deg, transparent 0 12deg, rgba(255,234,0,0.20) 12deg 24deg)" }}
+                  animate={{ rotate: 360, opacity: [0.25, 0.5, 0.25] }}
+                  transition={{ rotate: { duration: 18, repeat: Infinity, ease: "linear" }, opacity: { duration: 3, repeat: Infinity } }}
+                />
+                {/* the surprise that pops out */}
+                <motion.div
+                  className="absolute z-10 grid place-items-center"
+                  style={{ top: "26%" }}
+                  animate={{ y: [30, 30, -34, -34, 30], scale: [0.4, 0.4, 1, 1, 0.4], opacity: [0, 0, 1, 1, 0] }}
+                  transition={{ duration: 3.2, times: [0, 0.28, 0.46, 0.74, 1], repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <div className="w-24 h-24 rounded-full bg-[#FFEA00] brutal grid place-items-center">
+                    <Phosphor.Gift size={44} weight="fill" />
+                  </div>
+                </motion.div>
+                {/* sparkles */}
+                {[
+                  { top: "20%", left: "26%", d: 0.1, s: 26 },
+                  { top: "24%", left: "68%", d: 0.25, s: 20 },
+                  { top: "40%", left: "18%", d: 0.4, s: 18 },
+                  { top: "34%", left: "76%", d: 0.15, s: 24 },
+                ].map((sp, i) => (
+                  <motion.div
+                    key={i}
+                    aria-hidden
+                    className="absolute z-10 text-[#00F0FF]"
+                    style={{ top: sp.top, left: sp.left }}
+                    animate={{ opacity: [0, 0, 1, 0], scale: [0.2, 0.2, 1.1, 0.2], rotate: [0, 0, 40, 0] }}
+                    transition={{ duration: 3.2, times: [0, 0.4, 0.55, 0.9], repeat: Infinity, delay: sp.d, ease: "easeInOut" }}
+                  >
+                    <Sparkle size={sp.s} weight="fill" />
+                  </motion.div>
+                ))}
+
+                {/* box */}
+                <div className="relative z-20" style={{ width: 210 }}>
+                  {/* lid — lifts up & tilts when opening */}
+                  <motion.div
+                    className="absolute left-1/2 z-30"
+                    style={{ x: "-50%", top: -18, transformOrigin: "bottom center" }}
+                    animate={{ y: [0, 0, -78, -78, 0], rotate: [0, 0, -14, -14, 0] }}
+                    transition={{ duration: 3.2, times: [0, 0.28, 0.46, 0.74, 1], repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <div className="w-[236px] h-[46px] rounded-lg bg-[#FF007F] brutal" />
+                    <div className="absolute inset-x-0 -top-3 flex justify-center">
+                      <div className="w-8 h-8 rounded-full bg-[#FFEA00] brutal-sm" />
+                    </div>
+                  </motion.div>
+                  {/* body */}
+                  <div className="relative w-[210px] h-[150px] rounded-lg bg-[#00F0FF] brutal overflow-hidden">
+                    <div className="absolute left-1/2 -translate-x-1/2 top-0 h-full w-9 bg-[#FF007F] border-x-[3px] border-[#09090B]" />
+                    <div className="absolute top-1/2 -translate-y-1/2 left-0 w-full h-9 bg-[#FF007F] border-y-[3px] border-[#09090B]" />
+                    <div className="absolute inset-0 grid place-items-center">
+                      <span className="font-display font-black text-5xl text-[#09090B]/80 relative z-10">?</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </motion.div>
             <motion.div
               initial={{ scale: 0, rotate: -20 }}

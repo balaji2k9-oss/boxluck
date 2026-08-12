@@ -47,6 +47,11 @@ export const Nav = () => {
 
           {user ? (
             <div className="hidden md:flex items-center gap-2">
+              {user.role === "admin" && (
+                <Link to="/admin" className="bg-[#39FF14] brutal-sm rounded-full px-4 py-2.5 font-bold text-sm uppercase press" data-testid="nav-admin">
+                  Admin
+                </Link>
+              )}
               <Link to="/account" className="w-11 h-11 grid place-items-center bg-[#00F0FF] brutal-sm rounded-full press" data-testid="nav-account">
                 <User size={20} weight="bold" />
               </Link>
@@ -82,6 +87,7 @@ export const Nav = () => {
           <a href="/#golden" onClick={() => setOpen(false)}>Golden Box</a>
           {user ? (
             <>
+              {user.role === "admin" && <Link to="/admin" onClick={() => setOpen(false)}>Admin</Link>}
               <Link to="/account" onClick={() => setOpen(false)}>My Account</Link>
               <button className="text-left" onClick={async () => { await logout(); setOpen(false); }}>Logout</button>
             </>

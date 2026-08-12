@@ -86,6 +86,12 @@ async def get_current_user(request: Request) -> dict:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
+async def require_admin(user: dict = Depends(get_current_user)) -> dict:
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
+
 # ---------------- Models ----------------
 class RegisterInput(BaseModel):
     name: str
@@ -174,7 +180,13 @@ BOXES_SEED = [
 async def seed_data():
     await db.users.create_index("email", unique=True)
     for b in BOXES_SEED:
-        await db.boxes.update_one({"slug": b["slug"]}, {"$set": b}, upsert=True)
+        await db.boxes.update_one(
+            {"slug": b["slug"]},
+            {"$set": b, "$setOnInsert": {"prices": dict(TIER_PRICES)}},
+            upsert=True,
+        )
+    await db.boxes.update_many({"prices": {"$exists": False}},
+                               {"$set": {"prices": dict(TIER_PRICES)}})
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@mysterybox.in")
     admin_password = os.environ.get("ADMIN_PASSWORD", "admin123")
     existing = await db.users.find_one({"email": admin_email})
@@ -237,7 +249,7 @@ async def me(user: dict = Depends(get_current_user)):
 async def list_boxes():
     boxes = await db.boxes.find({}, {"_id": 0}).to_list(100)
     for b in boxes:
-        b["tiers"] = TIER_PRICES
+        b["tiers"] = b.get("prices") or dict(TIER_PRICES)
     return boxes
 
 
@@ -246,7 +258,7 @@ async def get_box(slug: str):
     box = await db.boxes.find_one({"slug": slug}, {"_id": 0})
     if not box:
         raise HTTPException(status_code=404, detail="Box not found")
-    box["tiers"] = TIER_PRICES
+    box["tiers"] = box.get("prices") or dict(TIER_PRICES)
     return box
 
 
@@ -259,16 +271,22 @@ def compute_total(items: List[CartItem]) -> float:
     return round(total, 2)
 
 
-async def build_order_items(items: List[CartItem]) -> List[dict]:
+async def build_order_items(items: List[CartItem]):
     out = []
+    total = 0.0
     for it in items:
         box = await db.boxes.find_one({"slug": it.box_id}, {"_id": 0})
         if not box:
             raise HTTPException(status_code=400, detail=f"Invalid box: {it.box_id}")
+        if it.tier not in TIER_PRICES:
+            raise HTTPException(status_code=400, detail=f"Invalid tier: {it.tier}")
+        prices = box.get("prices") or TIER_PRICES
+        price = float(prices.get(it.tier, TIER_PRICES[it.tier]))
         out.append({"box_id": it.box_id, "name": box["name"], "tier": it.tier,
-                    "tier_label": TIER_LABELS[it.tier], "quantity": it.quantity,
-                    "price": TIER_PRICES[it.tier]})
-    return out
+                    "tier_label": f"₹{int(price)} {it.tier.title()}", "quantity": it.quantity,
+                    "price": price})
+        total += price * it.quantity
+    return out, round(total, 2)
 
 
 # ---------------- Checkout Routes ----------------
@@ -276,8 +294,7 @@ async def build_order_items(items: List[CartItem]) -> List[dict]:
 async def checkout(payload: CheckoutInput, request: Request, user: dict = Depends(get_current_user)):
     if not payload.items:
         raise HTTPException(status_code=400, detail="Cart is empty")
-    total = compute_total(payload.items)
-    order_items = await build_order_items(payload.items)
+    order_items, total = await build_order_items(payload.items)
     now = datetime.now(timezone.utc).isoformat()
     order = {
         "user_id": user["id"], "user_email": user["email"], "type": "order",
@@ -407,6 +424,80 @@ async def my_orders(user: dict = Depends(get_current_user)):
         o["id"] = str(o["_id"])
         o.pop("_id", None)
     return orders
+
+
+# ---------------- Admin ----------------
+class BoxInput(BaseModel):
+    slug: str
+    name: str
+    emoji: str = "Gift"
+    tagline: str = ""
+    description: str = ""
+    color: str = "#FFEA00"
+    image: str = ""
+    prices: dict
+
+
+class BoxUpdate(BaseModel):
+    name: Optional[str] = None
+    emoji: Optional[str] = None
+    tagline: Optional[str] = None
+    description: Optional[str] = None
+    color: Optional[str] = None
+    image: Optional[str] = None
+    prices: Optional[dict] = None
+
+
+@api_router.get("/admin/stats")
+async def admin_stats(admin: dict = Depends(require_admin)):
+    orders = await db.orders.find().to_list(10000)
+    revenue = sum(o.get("amount", 0) for o in orders if o.get("payment_status") in ("paid", "cod"))
+    return {
+        "orders": len(orders),
+        "revenue": round(revenue, 2),
+        "boxes": await db.boxes.count_documents({}),
+        "customers": await db.users.count_documents({"role": "customer"}),
+    }
+
+
+@api_router.get("/admin/orders")
+async def admin_orders(admin: dict = Depends(require_admin)):
+    orders = await db.orders.find().sort("created_at", -1).to_list(2000)
+    for o in orders:
+        o["id"] = str(o["_id"])
+        o.pop("_id", None)
+    return orders
+
+
+@api_router.post("/admin/boxes")
+async def admin_create_box(payload: BoxInput, admin: dict = Depends(require_admin)):
+    slug = payload.slug.strip().lower()
+    if await db.boxes.find_one({"slug": slug}):
+        raise HTTPException(status_code=400, detail="A box with this slug already exists")
+    doc = payload.model_dump()
+    doc["slug"] = slug
+    await db.boxes.insert_one(doc)
+    doc.pop("_id", None)
+    return doc
+
+
+@api_router.put("/admin/boxes/{slug}")
+async def admin_update_box(slug: str, payload: BoxUpdate, admin: dict = Depends(require_admin)):
+    update = {k: v for k, v in payload.model_dump().items() if v is not None}
+    if not update:
+        raise HTTPException(status_code=400, detail="Nothing to update")
+    res = await db.boxes.update_one({"slug": slug}, {"$set": update})
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Box not found")
+    return await db.boxes.find_one({"slug": slug}, {"_id": 0})
+
+
+@api_router.delete("/admin/boxes/{slug}")
+async def admin_delete_box(slug: str, admin: dict = Depends(require_admin)):
+    res = await db.boxes.delete_one({"slug": slug})
+    if res.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Box not found")
+    return {"ok": True}
 
 
 app.include_router(api_router)

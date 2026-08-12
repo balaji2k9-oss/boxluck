@@ -15,6 +15,7 @@ import Checkout from "@/pages/Checkout";
 import Auth from "@/pages/Auth";
 import Account from "@/pages/Account";
 import PaymentResult from "@/pages/PaymentResult";
+import Admin from "@/pages/Admin";
 
 function App() {
   useEffect(() => {
@@ -35,6 +36,7 @@ function App() {
                 <Route path="/login" element={<Auth mode="login" />} />
                 <Route path="/register" element={<Auth mode="register" />} />
                 <Route path="/account" element={<Account />} />
+                <Route path="/admin" element={<Admin />} />
                 <Route path="/payment/success" element={<PaymentResult />} />
                 <Route path="/payment/cancel" element={<PaymentResult cancelled />} />
               </Routes>
