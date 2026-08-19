@@ -18,7 +18,7 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field, EmailStr, BeforeValidator, ConfigDict
 
-from emergentintegrations.payments.stripe.checkout import (
+from stripe_local import (
     StripeCheckout, CheckoutSessionRequest, CheckoutStatusResponse,
 )
 
